@@ -83,6 +83,12 @@
       display: block;
     }
   }
+  .modal{
+    &__close{
+      right: 10px;
+      top: 18px;
+    }
+  }
 }
 @media (max-width: 375px) {
   .catalog{
@@ -101,6 +107,13 @@
     &__info{
       padding: 50px 0 60px 0;
       width: 100%;
+    }
+  }
+  .modal{
+    &__close{
+      right: 45px;
+      font-size: 40px;
+      top: 10px;
     }
   }
 }
