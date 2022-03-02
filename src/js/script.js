@@ -1,8 +1,3 @@
-var script = document.createElement('script');
-script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
-script.type = 'text/javascript';
-document.getElementsByTagName('head')[0].appendChild(script);
-
 $(document).ready(function(){
     $('.carousel__inner').slick({
         speed: 1200,
@@ -13,7 +8,7 @@ $(document).ready(function(){
             {
                 breakpoint: 992,
                 settings: {
-                    dots: false,
+                    dots: true,
                     arrows: false
                 }
             }
@@ -41,47 +36,85 @@ $(document).ready(function(){
 
     // Modal
 
-    $('[data-modal=consultation]').on('click',function (){
+    $('[data-modal=consultation]').on('click', function() {
         $('.overlay, #consultation').fadeIn('slow');
     });
-    $('.modal__close').on('click',function (){
-        $('.overlay,#consultation,#order,#thanks').fadeOut('slow');
+    $('.modal__close').on('click', function() {
+        $('.overlay, #consultation, #thanks, #order').fadeOut('slow');
     });
-    // $('.button_mini').on('click', function(){
-    //     $('.overlay, #order').fadeIn('slow');
-    // });
-    $('.button_mini').each(function (i){
-        $(this).on('click', function (){
+
+    $('.button_mini').each(function(i) {
+        $(this).on('click', function() {
             $('#order .modal__descr').text($('.catalog-item__subtitle').eq(i).text());
             $('.overlay, #order').fadeIn('slow');
         })
     });
-    $('#consultation-form').validate();
-    $('#consultation form').validate({
-        rules:{
-        name:"required",
-            phone:"required",
-            email:{
-            required:true,
-                email:true
-            }
 
-
-         },
-        messages:{
-            name:"Please specify your name",
-            phone:"Please, enter your phone",
-            email:{
-                required: "We meed your email address to contact you",
-                email:"Your email address must be in the format of name@mail.com"
-            }
-        }
-    });
-    $('#order form').validate();
     function validateForms(form){
+        $(form).validate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                phone: "required",
+                email: {
+                    required: true,
+                    email: true
+                }
+            },
+            messages: {
+                name: {
+                    required: "Пожалуйста, введите свое имя",
+                    minlength: jQuery.validator.format("Введите {0} символа!")
+                  },
+                phone: "Пожалуйста, введите свой номер телефона",
+                email: {
+                  required: "Пожалуйста, введите свою почту",
+                  email: "Неправильно введен адрес почты"
+                }
+            }
+        });
+    };
 
-    }
+    validateForms('#consultation-form');
+    validateForms('#consultation form');
+    validateForms('#order form');
 
     $('input[name=phone]').mask("+38 (999) 999-99-99");
+
+    $('form').submit(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "mailer/smart.php",
+            data: $(this).serialize()
+        }).done(function() {
+            $(this).find("input").val("");
+            $('#consultation, #order').fadeOut();
+            $('.overlay, #thanks').fadeIn('slow');
+
+            $('form').trigger('reset');
+        });
+        return false;
+    });
+
+    // Smooth scroll and pageup
+
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 1600) {
+            $('.pageup').fadeIn();
+        } else {
+            $('.pageup').fadeOut();
+        }
+    });
+
+    $("a[href^='#']").click(function(){
+        const _href = $(this).attr("href");
+        $("html, body").animate({scrollTop: $(_href).offset().top+"px"});
+        return false;
+    });
+
+    new WOW().init();
 });
 
